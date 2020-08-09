@@ -1,0 +1,126 @@
+document.addEventListener("DOMContentLoaded", () =>{
+
+    const squares = document.querySelectorAll(".grid div");
+    const playerGuide = document.querySelector("#player-guide");
+    var instruction = document.querySelector("#instruction");
+    let currentPlayer = 1;
+    let playing = false;
+    let letRestart = false;
+    let flash = null;
+    //create an array which contains all possible winning combinations
+    const winningArrays = [
+        [0, 1, 2, 3], [41, 40, 39, 38], [7, 8, 9, 10], [34, 33, 32, 31], [14, 15, 16, 17], [27, 26, 25, 24], [21, 22, 23, 24],
+        [20, 19, 18, 17], [28, 29, 30, 31], [13, 12, 11, 10], [35, 36, 37, 38], [6, 5, 4, 3], [0, 7, 14, 21], [41, 34, 27, 20],
+        [1, 8, 15, 22], [40, 33, 26, 19], [2, 9, 16, 23], [39, 32, 25, 18], [3, 10, 17, 24], [38, 31, 24, 17], [4, 11, 18, 25],
+        [37, 30, 23, 16], [5, 12, 19, 26], [36, 29, 22, 15], [6, 13, 20, 27], [35, 28, 21, 14], [0, 8, 16, 24], [41, 33, 25, 17],
+        [7, 15, 23, 31], [34, 26, 18, 10], [14, 22, 30, 38], [27, 19, 11, 3], [35, 29, 23, 17], [6, 12, 18, 24], [28, 22, 16, 10],
+        [13, 19, 25, 31], [21, 15, 9, 3], [20, 26, 32, 38], [36, 30, 24, 18], [5, 11, 17, 23], [37, 31, 25, 19], [4, 10, 16, 22],
+        [2, 10, 18, 26], [39, 31, 23, 15], [1, 9, 17, 25], [40, 32, 24, 16], [9, 7, 25, 33], [8, 16, 24, 32], [11, 7, 23, 29],
+        [12, 18, 24, 30], [1, 2, 3, 4], [5, 4, 3, 2], [8, 9, 10, 11], [12, 11, 10, 9], [15, 16, 17, 18], [19, 18, 17, 16],
+        [22, 23, 24, 25], [26, 25, 24, 23], [29, 30, 31, 32], [33, 32, 31, 30], [36, 37, 38, 39], [40, 39, 38, 37], [7, 14, 21, 28],
+        [8, 15, 22, 29], [9, 16, 23, 30], [10, 17, 24, 31], [11, 18, 25, 32], [12, 19, 26, 33], [13, 20, 27, 34]
+        ]; 
+    
+    document.body.onkeyup = function(e){
+        //start the game when the user presses spacebar
+        if(e.keyCode == 32 && playing === false && letRestart == false){
+            playing = true;
+            instruction.textContent = "";
+            playerGuide.innerHTML = "Your turn <span class=\"cyan\">Player One</span>";
+        } 
+        //restart the game when the 'r' key is pressed
+        else if(e.keyCode == 82 && letRestart === true){
+            clearInterval(flash);
+            for(var z = 0; z < 42; z++){
+                squares[z].classList.remove("taken");
+                squares[z].classList.remove("player-one");
+                squares[z].classList.remove("player-two");
+                squares[z].classList.remove("highlight");
+                playing = true;
+                currentPlayer = 1;
+                instruction.textContent = "";
+                playerGuide.innerHTML = "Your turn <span class=\"cyan\">Player One</span>";
+            }
+        }
+    }
+    
+    for(var i = 0; i < squares.length; i++){
+        //set an id for each sqaure in the grid
+        squares[i].setAttribute("id", i);
+        //add click event to each sqaure
+        squares[i].addEventListener("click", function(){
+            //check if the square below the current sqaure is taken
+            var id = Number(this.getAttribute("id"));
+            if(playing === true){
+                if(squares[id + 7].classList.contains("taken") && !(squares[id].classList.contains("taken"))){
+                    if(currentPlayer === 1){
+                        squares[id].classList.add("taken");
+                        squares[id].classList.add("player-one");
+                        //change player
+                        currentPlayer = 2;
+                        playerGuide.innerHTML = "Your turn <span class=\"orange\">Player Two</span>";
+                    } else if(currentPlayer === 2){
+                        squares[id].classList.add("taken");
+                        squares[id].classList.add("player-two");
+                        //change player
+                        currentPlayer = 1;
+                        playerGuide.innerHTML = "Your turn <span class=\"cyan\">Player One</span>";
+                    }
+                } else {
+                    alert("Can't go there");
+                }
+                checkBoard();
+            }  
+        })
+    }
+    
+    function checkBoard(){
+        //take the values from each winning array and find the corresponding sqaures on the grid
+        for(var y = 0; y < winningArrays.length; y++){
+           square1 = squares[winningArrays[y][0]];
+           square2 = squares[winningArrays[y][1]];
+           square3 = squares[winningArrays[y][2]];
+           square4 = squares[winningArrays[y][3]];
+           
+            //check to see if all of these squares have the class player-one
+            if(square1.classList.contains("player-one") &&
+            square2.classList.contains("player-one") &&
+            square3.classList.contains("player-one") &&
+            square4.classList.contains("player-one")){
+                //player one has won
+                flash = setInterval(highlightSquares, 500);
+                playing = false;
+                letRestart = true;
+                instruction.innerHTML = "[ press R to restart ]";
+                playerGuide.innerHTML =  "<span class=\"cyan\">Player One Wins</span>";
+                return;
+                
+            }
+            //check to see if all of these squares have the class player-two
+            else if(square1.classList.contains("player-two") &&
+            square2.classList.contains("player-two") &&
+            square3.classList.contains("player-two") &&
+            square4.classList.contains("player-two")){
+                //player two has won
+                flash = setInterval(highlightSquares, 500);
+                playing = false;
+                letRestart = true;
+                instruction.innerHTML = "[ press R to restart ]";
+                playerGuide.innerHTML =  "<span class=\"orange\">Player Two Wins</span>";
+                return;
+            }
+         
+        } 
+    }
+    //flash the winning combination of squares
+    function highlightSquares(){
+
+        if(letRestart === true){
+            square1.classList.toggle("highlight");
+            square2.classList.toggle("highlight");
+            square3.classList.toggle("highlight");
+            square4.classList.toggle("highlight"); 
+        }
+                       
+    }   
+})
