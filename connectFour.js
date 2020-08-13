@@ -1,12 +1,14 @@
-document.addEventListener("DOMContentLoaded", () =>{
+document.addEventListener("DOMContentLoaded", () => {
 
-    const squares = document.querySelectorAll(".grid div");
-    const playerGuide = document.querySelector("#player-guide");
-    var instruction = document.querySelector("#instruction");
-    let currentPlayer = 1;
-    let playing = false;
-    let letRestart = false;
-    let flash = null;
+    const squares = document.querySelectorAll(".grid div"),
+          playerGuide = document.querySelector("#player-guide"),
+          instruction = document.querySelector("#instruction");
+
+    let currentPlayer = 1,
+        playing = false,
+        letRestart = false,
+        flash = null;
+
     //create an array which contains all possible winning combinations
     const winningArrays = [
         [0, 1, 2, 3], [41, 40, 39, 38], [7, 8, 9, 10], [34, 33, 32, 31], [14, 15, 16, 17], [27, 26, 25, 24], [21, 22, 23, 24],
@@ -21,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () =>{
         [8, 15, 22, 29], [9, 16, 23, 30], [10, 17, 24, 31], [11, 18, 25, 32], [12, 19, 26, 33], [13, 20, 27, 34]
         ]; 
     
-    document.body.onkeyup = function(e){
+    document.body.onkeyup = e => {
         //start the game when the user presses spacebar
         if(e.keyCode == 32 && playing === false && letRestart == false){
             playing = true;
@@ -48,9 +50,9 @@ document.addEventListener("DOMContentLoaded", () =>{
         //set an id for each sqaure in the grid
         squares[i].setAttribute("id", i);
         //add click event to each sqaure
-        squares[i].addEventListener("click", function(){
+        squares[i].addEventListener("click", function() {
             //check if the square below the current sqaure is taken
-            var id = Number(this.getAttribute("id"));
+            let id = Number(this.getAttribute("id"));
             if(playing === true){
                 if(squares[id + 7].classList.contains("taken") && !(squares[id].classList.contains("taken"))){
                     if(currentPlayer === 1){
